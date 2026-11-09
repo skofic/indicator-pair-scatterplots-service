@@ -1,0 +1,43 @@
+{
+    "name": "indicator-pair-scatterplots-service",
+    "version": "0.1.0",
+    "description": "Read API of the EUFGIS species distribution map and indicator pair scatterplot panes over the GeoService Scatter* collections: catalogue, base layer, species cells, units, map selection, suitability classes, maps manifest. Requests and answers use the data dictionary's vocabulary (ui_layout_state).",
+    "engines": {
+        "arangodb": "^3.0.0"
+    },
+    "author": "Milko Škofič",
+    "license": "Apache 2",
+    "main": "main.js",
+    "configuration": {
+        "metadataUi": {
+            "type": "string",
+            "default": "http://localhost:8529/_db/metadata/ui",
+            "description": "Base URL of the data dictionary's /ui Foxx service (metadata database): used by POST /state/validate and by the health check. The panes read their labels there directly."
+        },
+        "maxLevel": {
+            "type": "string",
+            "default": "gcu_loc_coordinates-restriction_manage",
+            "description": "The highest coordinates-restriction level this instance may answer: gcu_loc_coordinates-restriction_public, _value or _manage. A request asking for more is clamped. Set _public or _value on an instance reachable outside the portal."
+        },
+        "lang": {
+            "type": "string",
+            "default": "ISO_639_3_eng",
+            "description": "Fallback language key for the dataset titles and definitions of the catalogue (the only texts this service returns; every label lives in the dictionary)."
+        },
+        "prefill": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, setup fills the base-layer cache (PanesCache) for every configured pair × climate; about one second each. Otherwise each base answer is computed on its first request and cached."
+        },
+        "teardownDropsData": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, teardown also drops the Scatter* data collections this service created. Off by default: a wrong mount or a replace must never erase 250 000 loaded cells. The service's own cache collections are always dropped."
+        }
+    },
+    "scripts": {
+        "setup": "scripts/setup.js",
+        "teardown": "scripts/teardown.js"
+    },
+    "tests": "test/**/*.js"
+}

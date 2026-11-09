@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Node tooling
+node_modules/
+npm-debug.log*
+
+# Deploy bundle — built by `npm run bundle`, uploaded with a Foxx install / upgrade; a regenerated artefact, never source
+indicator-pair-scatterplots-service.zip
+
+# ArangoDB development artefacts
+*.arangodbrc

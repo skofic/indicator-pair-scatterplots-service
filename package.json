@@ -1,0 +1,9 @@
+{
+    "name": "indicator-pair-scatterplots-service",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Foxx service of the EUFGIS map and scatterplot panes (GeoService database). No npm dependencies: joi, chai and @arangodb/request come with ArangoDB.",
+    "scripts": {
+        "bundle": "rm -f indicator-pair-scatterplots-service.zip && zip -qr indicator-pair-scatterplots-service.zip manifest.json package.json main.js lib routes scripts test README.md MILKO.md LICENSE"
+    }
+}
