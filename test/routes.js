@@ -53,6 +53,15 @@ describe('base and species', function () {
         expect(idx.every((v, i) => i === 0 || v > idx[i - 1])).to.equal(true);
         expect(idx[idx.length - 1]).to.be.lessThan(cat.cells);
     });
+    it('GET /species/classes returns one digit per cell for an EU-Trees4F future, 404 for the reference period', function () {
+        const t4 = cat.climates.filter((c) => c.src === 'eutrees4f'), f = t4.find((c) => !c.present), p = t4.find((c) => c.present);
+        const r = get('/species/classes', { species: 'Quercus ilex', ...climate(f) });
+        if (r.status === 404) return;   // PanesSuitability not loaded for this species on this server
+        const j = json(r);
+        expect(j.cells).to.have.lengthOf(cat.cells);
+        expect(j.cells).to.match(/^[0-3]+$/);
+        expect(get('/species/classes', { species: 'Quercus ilex', ...climate(p) }).status).to.equal(404);
+    });
     it('GET /species/cells returns 404 for an unknown species', function () {
         expect(get('/species/cells', { species: 'Nullus arbor' }).status).to.equal(404);
     });

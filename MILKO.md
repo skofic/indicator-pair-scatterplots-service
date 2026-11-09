@@ -44,10 +44,11 @@ the places where the design rests on something outside this repository.
 
 ## Things to know
 
-- `PanesSuitability` is filled by the data repository's loader (its `sources/export/suitability.js`,
-  to become a loader): one document per species × EU-Trees4F period × scenario × variant with the class
-  digit per cell. The property that holds the digits is an open point (a descriptor to request, or a
-  cache field); the route reads `cells`.
+- `PanesSuitability` is filled by the data repository's loader (`sources/export/suitability.js`): one
+  document per species × EU-Trees4F period × scenario × variant, keyed by the dictionary terms
+  (`species`, `env_climate_period`, `env_climate_scenario`, `ui_layout_scatterplot_view_classes_variant`),
+  the class digit per cell of the global order under `_custom.cells` (with `counts` and the order's
+  `version`) until a descriptor for the string exists (open point of the design note, §10.2).
 - `/units/geo` returns points for the overview and one polygon on request; the simplified polygons of
   all units for the map overview are a static file (the data repository's `map-index.js` export), a
   Serve Plan item.

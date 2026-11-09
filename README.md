@@ -28,7 +28,7 @@ answer cache) and the cache fill.
 | Mount point | `/panes` (proposal) |
 | Base URL | `http://localhost:8529/_db/GeoService/panes` |
 | Reads | `ScatterOccurrences`, `ScatterSpecies`, `ScatterUnits`, `ScatterCells`, `ScatterMaps` (this project's, loaded by the pipeline), `Dataset`, `Units`, `UnitPolygons`, `WorldClim`, `Chelsa` (GeoService's) |
-| Owns | `PanesCache` (answer cache), `PanesSuitability` (class digits per species × EU-Trees4F period × scenario × variant) |
+| Owns | `PanesCache` (answer cache), `PanesSuitability` (class digits per species × EU-Trees4F period × scenario × variant: term keys `species`, `env_climate_period`, `env_climate_scenario`, `ui_layout_scatterplot_view_classes_variant`, the digit string under `_custom.cells` until a descriptor exists) |
 | Dependencies | none beyond ArangoDB's bundled `joi`, `chai`, `@arangodb/request` |
 
 Anonymous access, as the other Foxx services under `--server.authentication-system-only`: the portal
