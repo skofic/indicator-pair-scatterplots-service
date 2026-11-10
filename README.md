@@ -24,6 +24,7 @@ answer cache) and the cache fill.
 | Item | Value |
 |---|---|
 | ArangoDB | 3.12.4 Community (laptop) / 3.11.14 (work server) — the ecosystem stays on these versions |
+| JavaScript | **no `??` / `?.` operators** in the service's sources: ArangoDB 3.11's V8 does not parse them (install fails with error 3103); `nz(v, d)` stands in for `v ?? d`. Found at the first work-server install, 2026-11-11 |
 | Database | `GeoService` |
 | Mount point | `/panes` (proposal) |
 | Base URL | `http://localhost:8529/_db/GeoService/panes` |

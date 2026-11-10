@@ -1,4 +1,5 @@
 'use strict';
+const nz = (v, d) => (v === undefined || v === null ? d : v);   // `??` for ArangoDB 3.11's V8, which lacks the operator
 const createRouter = require('@arangodb/foxx/router');
 const joi = require('joi');
 const { resolveClimate, resolveAxes, resolveLevel, first } = require('../lib/state');
@@ -27,9 +28,9 @@ router.get('/cells', guard(function (req, res) {
 // GET /species/units?species=&std_dataset_ids=&ui_layout_scatterplot_X=&ui_layout_scatterplot_Y=&gcu_loc_coordinates-restriction_level=&gcu_id_country=&gcu_id_number=
 stateParams(router.get('/units', guard(function (req, res) {
     const s = speciesOf(req, res), level = resolveLevel(req.queryParams, req.headers), axes = resolveAxes(req.queryParams);
-    const dataset = first(req.queryParams[K.dataset]) ?? null;
+    const dataset = nz(first(req.queryParams[K.dataset]), null);
     const country = req.queryParams[K.country] ? String(req.queryParams[K.country]).split('_').pop() : null;
-    res.json(units(s, level, axes, dataset, { country, unit: req.queryParams[K.unit] ?? null }));
+    res.json(units(s, level, axes, dataset, { country, unit: nz(req.queryParams[K.unit], null) }));
 })), [K.species, K.dataset, K.X, K.Y, K.level, K.country, K.unit])
 .response(['application/json'], 'The units of the species the level allows, each with gcu_id_number, species_list, gcu_loc_coordinates-restriction, gcu_loc_climate_distance, values { "<period gid>|<scenario gid>": [x, y] } for every climate of the dataset, and gcu_loc_climate where the geometry rule allows it')
 .error(404, 'Unknown species')
@@ -42,7 +43,7 @@ stateParams(router.get('/units', guard(function (req, res) {
 // GET /species/classes?species=&std_dataset_ids=&env_climate_period=&env_climate_scenario=&ui_layout_scatterplot_view_classes_variant=
 stateParams(router.get('/classes', guard(function (req, res) {
     const s = speciesOf(req, res), c = resolveClimate(req.queryParams);
-    const out = classes(s, c, req.queryParams[K.variant] ?? 'ui_layout_scatterplot_view_classes_variant_potential');
+    const out = classes(s, c, nz(req.queryParams[K.variant], 'ui_layout_scatterplot_view_classes_variant_potential'));
     if (!out) res.throw(404, 'no suitability classes for this species and climate (EU-Trees4F future periods only, and the species must be in PanesSuitability)');
     res.json(out);
 })), [K.species, K.dataset, K.period, K.scenario, K.variant])

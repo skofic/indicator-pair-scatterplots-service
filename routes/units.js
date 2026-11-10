@@ -1,4 +1,5 @@
 'use strict';
+const nz = (v, d) => (v === undefined || v === null ? d : v);   // `??` for ArangoDB 3.11's V8, which lacks the operator
 const createRouter = require('@arangodb/foxx/router');
 const { resolveLevel } = require('../lib/state');
 const { unitsIndex, unitsGeo } = require('../lib/queries');
@@ -18,7 +19,7 @@ stateParams(router.get('/index', guard(function (req, res) {
 // GET /units/geo?gcu_loc_coordinates-restriction_level=&gcu_id_country=&species=&gcu_id_number=
 stateParams(router.get('/geo', guard(function (req, res) {
     const level = resolveLevel(req.queryParams, req.headers);
-    const out = unitsGeo(level, req.queryParams[K.unit] ?? null, req.queryParams[K.species] ?? null);
+    const out = unitsGeo(level, nz(req.queryParams[K.unit], null), nz(req.queryParams[K.species], null));
     if (!out) res.throw(404, `${K.unit}: unknown unit`);
     res.json(out);
 })), [K.level, K.country, K.species, K.unit])
