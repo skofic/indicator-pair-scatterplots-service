@@ -54,7 +54,7 @@ lib/
   http.js          shared query-parameter declarations and the error mapping
 routes/            one file per family: catalogue, base, species, selection, units, maps, state, health
 scripts/           setup.js, teardown.js
-test/routes.js     16 tests against the live collections (POST /_api/foxx/tests?mount=/panes)
+test/routes.js     18 tests against the live collections (POST /_api/foxx/tests?mount=/panes); the two that need the value / manage levels skip on a public-only instance, which gets a clamp test instead
 ```
 
 ## Routes

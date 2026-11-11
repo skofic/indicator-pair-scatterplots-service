@@ -9,6 +9,9 @@ const get = (path, qs) => request.get(`${base}${path}`, { qs });
 const post = (path, body) => request.post(`${base}${path}`, { body: JSON.stringify(body), headers: { 'content-type': 'application/json' } });
 const json = (r) => JSON.parse(r.body);
 const K = require('../lib/config').K;
+// A public-only instance (configuration maxLevel = public, the work server) clamps every level to public: the two tests that
+// need the value and manage levels are skipped there, and one test checks the clamp instead.
+const PUBLIC_ONLY = module.context.configuration.maxLevel === 'gcu_loc_coordinates-restriction_public';
 
 describe('catalogue', function () {
     const cat = json(get('/catalogue'));
@@ -65,7 +68,7 @@ describe('base and species', function () {
     it('GET /species/cells returns 404 for an unknown species', function () {
         expect(get('/species/cells', { species: 'Nullus arbor' }).status).to.equal(404);
     });
-    it('GET /species/units: public omits restricted units, value returns them without a point, manage adds the point for the requester\'s country only', function () {
+    (PUBLIC_ONLY ? it.skip : it)('GET /species/units: public omits restricted units, value returns them without a point, manage adds the point for the requester\'s country only', function () {
         const common = { species: 'Fagus sylvatica', [K.dataset]: wc[K.dataset] };
         const pub = json(get('/species/units', { ...common, [K.level]: 'gcu_loc_coordinates-restriction_public' }));
         const val = json(get('/species/units', { ...common, [K.level]: 'gcu_loc_coordinates-restriction_value' }));
@@ -82,6 +85,16 @@ describe('base and species', function () {
         expect(mine.length).to.equal(restricted.filter((u) => u.gcu_id_number.startsWith(country)).length);   // the country filter: that country's restricted units
         expect(mine.every((u) => 'gcu_loc_climate' in u)).to.equal(true);
         expect(others).to.have.lengthOf(0);
+    });
+    (PUBLIC_ONLY ? it : it.skip)('on a public-only instance the value and manage levels are clamped: no restricted unit, no withheld geometry', function () {
+        const common = { species: 'Fagus sylvatica', [K.dataset]: wc[K.dataset] };
+        const pub = json(get('/species/units', { ...common, [K.level]: 'gcu_loc_coordinates-restriction_public' }));
+        const man = json(get('/species/units', { ...common, [K.level]: 'gcu_loc_coordinates-restriction_manage' }));
+        expect(man.length).to.equal(pub.length);
+        expect(man.every((u) => !u['gcu_loc_coordinates-restriction'] && 'gcu_loc_climate' in u)).to.equal(true);
+        const index = json(get('/units/index', { [K.level]: 'gcu_loc_coordinates-restriction_manage' }));
+        expect(index.some((u) => u['gcu_loc_coordinates-restriction'])).to.equal(false);
+        expect(json(get('/health')).configuration.maxLevel).to.equal('gcu_loc_coordinates-restriction_public');
     });
     it('GET /species/units without a level is the public level', function () {
         const r = json(get('/species/units', { species: 'Fagus sylvatica' }));
@@ -116,7 +129,7 @@ describe('units, maps, state, health', function () {
         expect(r.every((u) => !u['gcu_loc_coordinates-restriction'])).to.equal(true);
         expect(r[0].gcu_id_country).to.match(/^ISO_3166_1_[A-Z]{3}$/);
     });
-    it('GET /units/geo gives points for a species and withholds a restricted unit below manage', function () {
+    (PUBLIC_ONLY ? it.skip : it)('GET /units/geo gives points for a species and withholds a restricted unit below manage', function () {
         const fc = json(get('/units/geo', { species: 'Fagus sylvatica' }));
         expect(fc.type).to.equal('FeatureCollection');
         expect(fc.features.length).to.be.greaterThan(400);
