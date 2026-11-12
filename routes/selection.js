@@ -20,7 +20,7 @@ router.post('/', guard(function (req, res) {
     [K.dataset]: joi.alternatives().try(joi.string(), joi.array().items(joi.string())).optional(),
     [K.period]: joi.string().optional(), [K.scenario]: joi.string().optional(), [K.X]: joi.string().optional(), [K.Y]: joi.string().optional(),
 }).unknown(true), 'A partial pane state: the drawn geometry (WGS84) and, for a point, the climate whose values to read')
-.response(['application/json'], '{ cells: index list of the surveyed cells inside; for a point also nearest { cell, metres } and point { cell, source, found, values: [x, y] } }')
+.response(['application/json'], '{ cells: index list of the surveyed cells inside; for a point also nearest { cell, metres }, geo_shape_elevation (m, from the WorldClim 2.1 elevation layer of the containing 1 km cell, null outside the grid) and point { cell, source, found, values: [x, y] } }')
 .error(400, 'No geometry, or an unknown climate / axis')
 .summary('A map geometry → cells; a point → climate values')
 .description(

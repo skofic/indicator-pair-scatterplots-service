@@ -100,6 +100,8 @@ describe('base and species', function () {
         const r = json(get('/species/units', { species: 'Fagus sylvatica' }));
         expect(r.every((u) => !u['gcu_loc_coordinates-restriction'])).to.equal(true);
         expect(Object.keys(r[0].values)).to.have.lengthOf(0);   // no dataset, no values
+        expect(r[0].geo_shape_elevation).to.be.a('number');   // the polygon's mean elevation, with its minimum and maximum
+        expect(r[0]['gcu_loc_elevation-min']).to.be.at.most(r[0]['gcu_loc_elevation-max']);
     });
 });
 
@@ -116,6 +118,8 @@ describe('selection', function () {
         expect(r.point.source).to.equal('WorldClim');
         expect(r.point.values).to.have.lengthOf(2);
         expect(r.point.values[0]).to.be.within(-5, 25);
+        expect(r.geo_shape_elevation).to.be.within(100, 1500);   // the Black Forest, from the WorldClim elevation layer
+        expect(json(post('/selection', { [K.selection]: { type: 'Point', coordinates: [8.1, 48.0] } })).geo_shape_elevation).to.equal(r.geo_shape_elevation);   // no climate needed
     });
     it('a line is rejected', function () {
         expect(post('/selection', { [K.selection]: { type: 'LineString', coordinates: [[0, 0], [1, 1]] } }).status).to.equal(400);
@@ -128,6 +132,7 @@ describe('units, maps, state, health', function () {
         expect(r.length).to.be.greaterThan(3000);
         expect(r.every((u) => !u['gcu_loc_coordinates-restriction'])).to.equal(true);
         expect(r[0].gcu_id_country).to.match(/^ISO_3166_1_[A-Z]{3}$/);
+        expect(r[0]).to.have.property('geo_shape_elevation');
     });
     (PUBLIC_ONLY ? it.skip : it)('GET /units/geo gives points for a species and withholds a restricted unit below manage', function () {
         const fc = json(get('/units/geo', { species: 'Fagus sylvatica' }));
