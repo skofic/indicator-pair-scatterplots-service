@@ -54,7 +54,7 @@ lib/
   http.js          shared query-parameter declarations and the error mapping
 routes/            one file per family: catalogue, base, species, selection, units, maps, state, health
 scripts/           setup.js, teardown.js
-test/routes.js     18 tests against the live collections (POST /_api/foxx/tests?mount=/panes); the two that need the value / manage levels skip on a public-only instance, which gets a clamp test instead
+test/routes.js     19 tests against the live collections (POST /_api/foxx/tests?mount=/panes); the two that need the value / manage levels skip on a public-only instance, which gets a clamp test instead
 ```
 
 ## Routes
@@ -66,7 +66,7 @@ Swagger is the reference (ArangoDB web interface → Services → panes → API)
 | `GET /catalogue` | What the selectors offer: datasets (as `std_dataset_ids` keys with title and definition), every dataset × period × scenario as terms with their data aliases, the X and Y axes and the five pairs, the species with availability flags, the countries, the length of the global cell order, the restriction levels. Cached. |
 | `GET /base` | The base layer: `[x, y]` or `null` per survey cell in the global order, for a dataset, period, scenario and pair. ~3.4 MB; computed once (0.8 s), then from `PanesCache` with an `ETag` (16 ms; 304 on `If-None-Match`). |
 | `GET /species/cells` | The cells holding a species: a sorted index list into the global order (climate-independent). |
-| `GET /species/units` | The units of a species at the restriction level, with the pair for every climate of the dataset (`values["<period gid>\|<scenario gid>"]`), the distance of the reference point from the polygon, and the point where the geometry rule allows it. |
+| `GET /species/units` | The units of a species (every unit without a species: the panes' empty state) at the restriction level, with the pair for every climate of the dataset (`values["<period gid>\|<scenario gid>"]`), the distance of the reference point from the polygon, and the point where the geometry rule allows it. |
 | `GET /species/classes` | The EU-Trees4F suitability class per cell (digits in the global order) for a future period, scenario and variant, from `PanesSuitability`. |
 | `POST /selection` | A map geometry → the cells inside (index list); a point → the containing / nearest survey cell, the elevation of the place (`geo_shape_elevation`, the WorldClim 2.1 elevation layer of the containing 1 km cell, no climate needed) and the pair at that place from the 1 km grid (`WorldClim` / `Chelsa` by the derived cell key) or, for EU-Trees4F, from the survey cell. |
 | `GET /units/index` | Every unit the level allows: number, country term, species, restriction, distance, and the polygon's averaged topography (`geo_shape_elevation` with `gcu_loc_elevation-min` / `-max`, `geo_shape_elevation_sd`, `geo_shape_slope`, `geo_shape_aspect`, from `UnitPolygons`; `/species/units` and `/units/geo` carry the same). The host page's facets. |

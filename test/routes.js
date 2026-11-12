@@ -96,6 +96,12 @@ describe('base and species', function () {
         expect(index.some((u) => u['gcu_loc_coordinates-restriction'])).to.equal(false);
         expect(json(get('/health')).configuration.maxLevel).to.equal('gcu_loc_coordinates-restriction_public');
     });
+    it('GET /species/units without a species lists every unit the level allows, the units index as many', function () {
+        const all = json(get('/species/units', { [K.dataset]: wc[K.dataset] })), index = json(get('/units/index'));
+        expect(all.length).to.equal(index.length);
+        expect(all.length).to.be.greaterThan(3000);
+        expect(Object.keys(all[0].values).length).to.be.greaterThan(0);
+    });
     it('GET /species/units without a level is the public level', function () {
         const r = json(get('/species/units', { species: 'Fagus sylvatica' }));
         expect(r.every((u) => !u['gcu_loc_coordinates-restriction'])).to.equal(true);

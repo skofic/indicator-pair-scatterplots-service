@@ -27,16 +27,16 @@ router.get('/cells', guard(function (req, res) {
 
 // GET /species/units?species=&std_dataset_ids=&ui_layout_scatterplot_X=&ui_layout_scatterplot_Y=&gcu_loc_coordinates-restriction_level=&gcu_id_country=&gcu_id_number=
 stateParams(router.get('/units', guard(function (req, res) {
-    const s = speciesOf(req, res), level = resolveLevel(req.queryParams, req.headers), axes = resolveAxes(req.queryParams);
+    const s = req.queryParams[K.species] ? speciesOf(req, res) : null, level = resolveLevel(req.queryParams, req.headers), axes = resolveAxes(req.queryParams);   // no species: every unit the level allows (the panes' empty state, 2026-11-12)
     const dataset = nz(first(req.queryParams[K.dataset]), null);
     const country = req.queryParams[K.country] ? String(req.queryParams[K.country]).split('_').pop() : null;
     res.json(units(s, level, axes, dataset, { country, unit: nz(req.queryParams[K.unit], null) }));
 })), [K.species, K.dataset, K.X, K.Y, K.level, K.country, K.unit])
 .response(['application/json'], 'The units of the species the level allows, each with gcu_id_number, species_list, gcu_loc_coordinates-restriction, gcu_loc_climate_distance, values { "<period gid>|<scenario gid>": [x, y] } for every climate of the dataset, and gcu_loc_climate where the geometry rule allows it')
 .error(404, 'Unknown species')
-.summary('The units of a species, per restriction level')
+.summary('The units of a species (or every unit, without a species), per restriction level')
 .description(
-    'The top layer of the scatterplot. **Restriction level** (`gcu_loc_coordinates-restriction_level`, set by the portal): `public` omits restricted units; `value` returns them with identifiers, climate values and distance, never a point; ' +
+    'The top layer of the scatterplot. Without `species`, every unit the level allows (the panes\' empty state: nothing chosen yet). **Restriction level** (`gcu_loc_coordinates-restriction_level`, set by the portal): `public` omits restricted units; `value` returns them with identifiers, climate values and distance, never a point; ' +
     '`manage` adds the reference point (`gcu_loc_climate`) of restricted units of the requester\'s country (`gcu_id_country`) only. Unrestricted units carry their point at every level. ' +
     'The `values` cover every period and scenario of the requested dataset, so the pane draws present → future arrows without a second call; without a dataset no values are returned.');
 
