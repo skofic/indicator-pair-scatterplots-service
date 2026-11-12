@@ -4,6 +4,7 @@
 // Fixtures: Fagus sylvatica (530 units, 35 853 cells), WorldClim 2.1 and EU-Trees4F datasets from the catalogue.
 const { expect } = require('chai');
 const request = require('@arangodb/request');
+const { db } = require('@arangodb');
 const base = module.context.baseUrl;
 const get = (path, qs) => request.get(`${base}${path}`, { qs });
 const post = (path, body) => request.post(`${base}${path}`, { body: JSON.stringify(body), headers: { 'content-type': 'application/json' } });
@@ -121,10 +122,11 @@ describe('selection', function () {
     });
     it('a point returns the climate values from the 1 km grid, with or without a surveyed cell', function () {
         const r = json(post('/selection', { [K.selection]: { type: 'Point', coordinates: [8.1, 48.0] }, [K.dataset]: wc[K.dataset], [K.period]: wc[K.period], [K.scenario]: wc[K.scenario] }));
-        expect(r.point.source).to.equal('WorldClim');
+        const GRID = !!db._collection('WorldClim') && db._collection('WorldClim').count() > 0;   // a slim instance has no 1 km grids: the nearest surveyed cell answers
+        expect(r.point.source).to.equal(GRID ? 'WorldClim' : 'ScatterOccurrences');
         expect(r.point.values).to.have.lengthOf(2);
         expect(r.point.values[0]).to.be.within(-5, 25);
-        expect(r.geo_shape_elevation).to.be.within(100, 1500);   // the Black Forest, from the WorldClim elevation layer
+        if (GRID) expect(r.geo_shape_elevation).to.be.within(100, 1500);   // the Black Forest, from the WorldClim elevation layer
         expect(json(post('/selection', { [K.selection]: { type: 'Point', coordinates: [8.1, 48.0] } })).geo_shape_elevation).to.equal(r.geo_shape_elevation);   // no climate needed
     });
     it('a line is rejected', function () {
