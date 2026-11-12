@@ -26,6 +26,6 @@ router.post('/', guard(function (req, res) {
 .description(
     'The map → scatterplot link. A **Polygon** (or MultiPolygon) returns the positions, in the global cell order, of the survey cells it contains (geo index). ' +
     'A **Point** returns the containing survey cell if one lies within 710 m (the half-diagonal of a 1 km cell), the nearest one within 5 km with its distance, and — when the state names a climate and axes — ' +
-    'the pair at that place: from the 1 km grid (WorldClim / Chelsa collections, the containing cell found by its derived key, the indicators derived as the loaders derive them) or, for EU-Trees4F, from the containing survey cell only.');
+    'the pair at that place: from the 1 km grid (WorldClim / Chelsa collections, the containing cell found by its derived key, the indicators derived as the loaders derive them) or, for EU-Trees4F, from the nearest survey cell within 5 km (its layers are 10 km cells; `nearest.metres` says how far).');
 
 module.exports = router;
